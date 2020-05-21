@@ -26,17 +26,17 @@ def build_model(is_training, images, params):
     channels = [num_channels, num_channels * 2]
     for i, c in enumerate(channels):
         with tf.variable_scope('block_{}'.format(i+1)):
-            out = tf.layers.conv2d(out, c, 3, padding='same')
+            out = tf.keras.layers.conv2d(out, c, 3, padding='same')
             if params.use_batch_norm:
                 out = tf.layers.batch_normalization(out, momentum=bn_momentum, training=is_training)
             out = tf.nn.relu(out)
-            out = tf.layers.max_pooling2d(out, 2, 2)
+            out = tf.keras.layers.max_pooling2d(out, 2, 2)
 
     assert out.shape[1:] == [7, 7, num_channels * 2]
 
     out = tf.reshape(out, [-1, 7 * 7 * num_channels * 2])
     with tf.variable_scope('fc_1'):
-        out = tf.layers.dense(out, params.embedding_size)
+        out = tf.keras.layers.dense(out, params.embedding_size)
 
     return out
 
@@ -61,11 +61,11 @@ def model_fn(features, labels, mode, params):
 
     # -----------------------------------------------------------
     # MODEL: define the layers of the model
-    with tf.variable_scope('model'):
+    with tf.compat.v1.variable_scope('model'):
         # Compute the embeddings with the model
         embeddings = build_model(is_training, images, params)
     embedding_mean_norm = tf.reduce_mean(tf.norm(embeddings, axis=1))
-    tf.summary.scalar("embedding_mean_norm", embedding_mean_norm)
+    tf.compat.v1.summary.scalar("embedding_mean_norm", embedding_mean_norm)
 
     if mode == tf.estimator.ModeKeys.PREDICT:
         predictions = {'embeddings': embeddings}
@@ -88,7 +88,7 @@ def model_fn(features, labels, mode, params):
     # Metrics for evaluation using tf.metrics (average over whole dataset)
     # TODO: some other metrics like rank-1 accuracy?
     with tf.variable_scope("metrics"):
-        eval_metric_ops = {"embedding_mean_norm": tf.metrics.mean(embedding_mean_norm)}
+        eval_metric_ops = {"embedding_mean_norm": tf.compat.v1.metrics.mean(embedding_mean_norm)}
 
         if params.triplet_strategy == "batch_all":
             eval_metric_ops['fraction_positive_triplets'] = tf.metrics.mean(fraction)
@@ -105,8 +105,8 @@ def model_fn(features, labels, mode, params):
     tf.summary.image('train_image', images, max_outputs=1)
 
     # Define training step that minimizes the loss with the Adam optimizer
-    optimizer = tf.train.AdamOptimizer(params.learning_rate)
-    global_step = tf.train.get_global_step()
+    optimizer = tf.compat.v1.train.AdamOptimizer(params.learning_rate)
+    global_step = tf.compat.v1.train.get_global_step()
     if params.use_batch_norm:
         # Add a dependency to update the moving mean and variance for batch normalization
         with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
