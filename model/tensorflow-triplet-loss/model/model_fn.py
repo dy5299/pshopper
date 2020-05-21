@@ -56,8 +56,8 @@ def model_fn(features, labels, mode, params):
     is_training = (mode == tf.estimator.ModeKeys.TRAIN)
 
     images = features
-    images = tf.reshape(images, [-1, params.image_size, params.image_size, 1])
-    assert images.shape[1:] == [params.image_size, params.image_size, 1], "{}".format(images.shape)
+    images = tf.reshape(images, [-1, params.image_size, params.image_size, 3])
+    assert images.shape[1:] == [params.image_size, params.image_size, 3], "{}".format(images.shape)
 
     # -----------------------------------------------------------
     # MODEL: define the layers of the model
