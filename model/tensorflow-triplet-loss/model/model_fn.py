@@ -5,6 +5,9 @@ import tensorflow as tf
 from model.triplet_loss import batch_all_triplet_loss
 from model.triplet_loss import batch_hard_triplet_loss
 
+#for model
+#from tensorflow.python.keras.models import Sequential
+#from tensorflow.python.keras.layers import Conv2D, MaxPooling2D, Dense, Activation, BatchNormalization, ReLU
 
 def build_model(is_training, images, params):
     """Compute outputs of the model (embeddings for triplet loss).
@@ -26,17 +29,22 @@ def build_model(is_training, images, params):
     channels = [num_channels, num_channels * 2]
     for i, c in enumerate(channels):
         with tf.variable_scope('block_{}'.format(i+1)):
-            out = tf.keras.layers.conv2d(out, c, 3, padding='same')
+            out = tf.layers.conv2d(out, c, 3, padding='same')
+            #out =Conv2D(out, c, 3, padding='same')
             if params.use_batch_norm:
                 out = tf.layers.batch_normalization(out, momentum=bn_momentum, training=is_training)
+                #out =BatchNormalization(out, momentum=bn_momentum, training=is_training)
             out = tf.nn.relu(out)
-            out = tf.keras.layers.max_pooling2d(out, 2, 2)
+            #out = ReLU(out)
+            out = tf.layers.max_pooling2d(out, 2, 2)
+            #out = MaxPooling2D(out, 2, 2)
 
     assert out.shape[1:] == [7, 7, num_channels * 2]
 
     out = tf.reshape(out, [-1, 7 * 7 * num_channels * 2])
     with tf.variable_scope('fc_1'):
-        out = tf.keras.layers.dense(out, params.embedding_size)
+        out = tf.layers.dense(out, params.embedding_size)
+        #out = Dense(out, params.embedding_size)
 
     return out
 

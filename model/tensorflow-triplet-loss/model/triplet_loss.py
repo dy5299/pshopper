@@ -17,7 +17,7 @@ def _pairwise_distances(embeddings, squared=False):
     # Get the dot product between all embeddings
     # shape (batch_size, batch_size)
     dot_product = tf.matmul(embeddings, tf.transpose(embeddings))
-
+    batch_hard_triplet_loss
     # Get squared L2 norm for each embedding. We can just take the diagonal of `dot_product`.
     # This also provides more numerical stability (the diagonal of the result will be exactly 0).
     # shape (batch_size,)
