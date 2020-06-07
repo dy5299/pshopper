@@ -10,7 +10,8 @@ def main(req):
     stars = ['iu', 'irene', 'hyuna', 'yerin', 'sunmi', 'jennie']
     thumbnails = os.listdir('static/step1/star_thumbnails')
 
-    context = {"stars": stars, "thumbnails": [thumbnails[:4],thumbnails[4:8],thumbnails[8:]], "thumb_range": range(4, len(thumbnails), 4)}
+#    context = {"stars": stars, "thumbnails": [thumbnails[:4],thumbnails[4:8],thumbnails[8:]], "thumb_range": range(4, len(thumbnails), 4)}
+    context = {"stars": stars, "thumbnails": thumbnails}
 
     return render(req, 'styles/main.html', context)
 
